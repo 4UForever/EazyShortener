@@ -1,0 +1,12 @@
+# System
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+
+# Node (assuming it might be a Node.js project)
+node_modules/
+dist/
+build/
+.env
