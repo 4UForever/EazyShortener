@@ -10,3 +10,6 @@ node_modules/
 dist/
 build/
 .env
+
+# Local implementation plan (not part of the public portfolio repository)
+EazyShortener-Plan.md
