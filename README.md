@@ -258,12 +258,12 @@ git clone <your-repository-url>
 cd EazyShortener
 
 npm install
-cp env.example .env
+cp .env.example .env
 ```
 
 ### Environment configuration
 
-Edit `.env` after copying `env.example`.
+Edit `.env` after copying `.env.example`.
 
 The application connects to PostgreSQL through `DATABASE_URL`. `POSTGRES_USER`, `POSTGRES_PASSWORD`, and `POSTGRES_DB` are used by the local PostgreSQL container during bootstrap and should match the credentials embedded in `DATABASE_URL`.
 
