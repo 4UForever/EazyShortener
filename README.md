@@ -277,10 +277,7 @@ The application does not reuse `APP_SECRET` directly for multiple cryptographic 
 
 Do not commit the real `APP_SECRET` or your local `.env` file. Rotating `APP_SECRET` invalidates JWTs and changes derived analytics fingerprints, so production rotation should be planned rather than done casually.
 
-After configuring `.env`, start PostgreSQL, Redis, and Mailpit:
-```bash
-docker compose up -d
-```
+After configuring `.env`, make sure the required local services are already running. This project can reuse an existing Laradock (or equivalent) environment for PostgreSQL and Mailpit instead of starting duplicate containers. Point `DATABASE_URL` and the SMTP settings in `.env` at those local services. In the current local Laradock setup, Mailpit SMTP is exposed on `localhost:1125` and the Mailpit web inbox is available at `http://localhost:8125`. Redis is introduced later in the implementation roadmap.
 
 Apply the Prisma schema and start the application:
 
