@@ -8,6 +8,7 @@
     "build": "nest build",
     "start": "nest start",
     "start:dev": "nest start --watch",
+    "prisma:generate": "prisma generate",
     "lint": "eslint . --max-warnings=0",
     "format": "prettier --write \"**/*.{ts,mjs,json}\" --ignore-path .gitignore",
     "format:check": "prettier --check \"**/*.{ts,mjs,json}\" --ignore-path .gitignore"
@@ -21,6 +22,7 @@
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.2.1",
     "@nestjs/platform-express": "^11.2.1",
+    "@prisma/client": "^6.0.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2"
   },
@@ -32,6 +34,7 @@
     "eslint-config-prettier": "^10.0.0",
     "globals": "^16.0.0",
     "prettier": "^3.0.0",
+    "prisma": "^6.0.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.0.0"
