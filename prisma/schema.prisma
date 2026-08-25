@@ -6,3 +6,25 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum LinkCreatedVia {
+  GUEST_WEB
+  USER_WEB
+  API
+}
+
+model Link {
+  id           String         @id @default(uuid()) @db.Uuid
+  userId       String?        @map("user_id") @db.Uuid
+  shortCode    String         @unique @map("short_code")
+  originalUrl  String         @map("original_url")
+  expiresAt    DateTime?      @map("expires_at")
+  isActive     Boolean        @default(true) @map("is_active")
+  createdVia   LinkCreatedVia @map("created_via")
+  createdAt    DateTime       @default(now()) @map("created_at")
+  updatedAt    DateTime       @updatedAt @map("updated_at")
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("links")
+}
