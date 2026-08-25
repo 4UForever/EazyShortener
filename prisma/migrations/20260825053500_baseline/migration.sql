@@ -1,0 +1,1 @@
+-- Baseline migration for the intentionally empty initial schema.
