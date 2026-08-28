@@ -24,6 +24,7 @@
     "@nestjs/platform-express": "^11.2.1",
     "@prisma/client": "^6.0.0",
     "argon2": "^0.44.0",
+    "nodemailer": "^9.0.5",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2"
   },
@@ -31,6 +32,7 @@
     "@eslint/js": "^9.0.0",
     "@nestjs/cli": "^11.0.24",
     "@types/node": "^24.0.0",
+    "@types/nodemailer": "^8.0.1",
     "eslint": "^9.0.0",
     "eslint-config-prettier": "^10.0.0",
     "globals": "^16.0.0",
