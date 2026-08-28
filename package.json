@@ -9,13 +9,14 @@
     "start": "nest start",
     "start:dev": "nest start --watch",
     "prisma:generate": "prisma generate",
+    "preinstall": "node scripts/require-pnpm.cjs",
     "lint": "eslint . --max-warnings=0",
     "format": "prettier --write \"**/*.{ts,mjs,json}\" --ignore-path .gitignore",
     "format:check": "prettier --check \"**/*.{ts,mjs,json}\" --ignore-path .gitignore"
   },
   "engines": {
     "node": ">=22.0.0",
-    "npm": ">=10.0.0"
+    "pnpm": ">=10.30.3"
   },
   "dependencies": {
     "@nestjs/common": "^11.2.1",
@@ -41,5 +42,6 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.0.0"
-  }
+  },
+  "packageManager": "pnpm@10.30.3+sha512.c961d1e0a2d8e354ecaa5166b822516668b7f44cb5bd95122d590dd81922f606f5473b6d23ec4a5be05e7fcd18e8488d47d978bbe981872f1145d06e9a740017"
 }

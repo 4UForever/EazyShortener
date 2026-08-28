@@ -248,7 +248,7 @@ The batch is limited to 10 URLs and is transactional: either every link is creat
 ### Prerequisites
 
 - Node.js LTS
-- npm
+- pnpm 10 (managed through Corepack)
 - Docker and Docker Compose
 
 ### Local setup
@@ -257,7 +257,8 @@ The batch is limited to 10 URLs and is transactional: either every link is creat
 git clone <your-repository-url>
 cd EazyShortener
 
-npm install
+corepack enable
+pnpm install
 cp .env.example .env
 ```
 
@@ -282,8 +283,8 @@ After configuring `.env`, make sure the required local services are already runn
 Apply the Prisma schema and start the application:
 
 ```bash
-npx prisma migrate dev
-npm run start:dev
+pnpm exec prisma migrate dev
+pnpm start:dev
 ```
 
 The application is expected to run at:
@@ -300,29 +301,29 @@ Common development commands:
 
 ```bash
 # start in watch mode
-npm run start:dev
+pnpm start:dev
 
 # type-check / build
-npm run build
+pnpm build
 
 # unit tests
-npm test
+pnpm test
 
 # end-to-end tests
-npm run test:e2e
+pnpm test:e2e
 
 # lint
-npm run lint
+pnpm lint
 ```
 
 Database workflow:
 
 ```bash
 # create/apply a development migration
-npx prisma migrate dev
+pnpm exec prisma migrate dev
 
 # inspect data with Prisma Studio
-npx prisma studio
+pnpm exec prisma studio
 ```
 
 Local infrastructure:
