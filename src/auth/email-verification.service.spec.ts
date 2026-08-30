@@ -6,6 +6,7 @@ import { EmailVerificationService } from './email-verification.service';
 function createHarness(ttlSeconds = 86_400) {
   const rows: Array<{ id: string; userId: string; tokenHash: string; expiresAt: Date; usedAt: Date | null }> = [];
   let sequence = 0;
+  const users = new Map<string, { status: string; emailVerifiedAt: Date | null }>();
   const prisma = {
     emailVerificationToken: {
       create: ({ data }: { data: { userId: string; tokenHash: string; expiresAt: Date } }) => {
@@ -24,9 +25,16 @@ function createHarness(ttlSeconds = 86_400) {
         return Promise.resolve({ count: 1 });
       },
     },
+    user: {
+      update: ({ where, data }: { where: { id: string }; data: { status: string; emailVerifiedAt: Date } }) => {
+        users.set(where.id, data);
+        return Promise.resolve({ id: where.id, ...data });
+      },
+    },
+    $transaction: <T>(callback: (tx: unknown) => Promise<T>) => callback(prisma),
   };
   const config = { get: (key: string) => (key === 'EMAIL_VERIFICATION_TTL_SECONDS' ? ttlSeconds : undefined) };
-  return { service: new EmailVerificationService(prisma as never, config as never), rows };
+  return { service: new EmailVerificationService(prisma as never, config as never), rows, users };
 }
 
 void test('issues cryptographically random raw tokens while persisting only their hashes with configured TTL', async () => {
@@ -49,6 +57,17 @@ void test('consumes a valid token exactly once', async () => {
 
   assert.equal(await service.consume(issued.rawToken, consumedAt), 'user-2');
   await assert.rejects(service.consume(issued.rawToken, consumedAt), /Invalid or expired verification token/);
+});
+
+void test('verifies a valid token, activates the user, and rejects reuse', async () => {
+  const { service, users } = createHarness();
+  const issued = await service.issue('user-verify', new Date('2026-08-29T00:00:00.000Z'));
+  const verifiedAt = new Date('2026-08-29T00:05:00.000Z');
+
+  assert.equal(await service.verify(issued.rawToken, verifiedAt), 'user-verify');
+  assert.equal(users.get('user-verify')?.status, 'ACTIVE');
+  assert.equal(users.get('user-verify')?.emailVerifiedAt?.toISOString(), verifiedAt.toISOString());
+  await assert.rejects(service.verify(issued.rawToken, verifiedAt), /Invalid or expired verification token/);
 });
 
 void test('rejects expired and unknown tokens', async () => {

@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { MailService } from '../mail/mail.service';
 import { AuthService } from './auth.service';
@@ -13,6 +13,12 @@ export class AuthController {
     private readonly mail: MailService,
     private readonly config: ConfigService,
   ) {}
+
+  @Get('verify-email')
+  async verifyEmail(@Query('token') token: string): Promise<{ verified: true }> {
+    await this.emailVerification.verify(token);
+    return { verified: true };
+  }
 
   @Post('register')
   async register(@Body() input: RegisterDto): Promise<{ id: string; email: string; status: string }> {

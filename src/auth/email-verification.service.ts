@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { UserStatus } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
 import { createHash, randomBytes } from 'node:crypto';
 import { PrismaService } from '../database/prisma.service';
@@ -49,6 +50,40 @@ export class EmailVerificationService {
 
     if (result.count !== 1) throw new Error('Invalid or expired verification token');
     return token.userId;
+  }
+
+  async verify(rawToken: string, now = new Date()): Promise<string> {
+    const tokenHash = this.hashToken(rawToken);
+
+    return this.prisma.$transaction(async (tx) => {
+      const token = await tx.emailVerificationToken.findUnique({
+        where: { tokenHash },
+        select: { id: true, userId: true },
+      });
+
+      if (!token) throw new Error('Invalid or expired verification token');
+
+      const consumed = await tx.emailVerificationToken.updateMany({
+        where: {
+          id: token.id,
+          usedAt: null,
+          expiresAt: { gt: now },
+        },
+        data: { usedAt: now },
+      });
+
+      if (consumed.count !== 1) throw new Error('Invalid or expired verification token');
+
+      await tx.user.update({
+        where: { id: token.userId },
+        data: {
+          status: UserStatus.ACTIVE,
+          emailVerifiedAt: now,
+        },
+      });
+
+      return token.userId;
+    });
   }
 
   private hashToken(rawToken: string): string {
