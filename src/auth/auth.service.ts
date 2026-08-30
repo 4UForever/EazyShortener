@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { User, UserStatus } from '@prisma/client';
 import { PrismaService } from '../database/prisma.service';
+import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
+import { JwtService } from './jwt.service';
 import { PasswordService } from './password.service';
 
 @Injectable()
@@ -9,6 +11,7 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly passwords: PasswordService,
+    private readonly jwt: JwtService,
   ) {}
 
   async register(input: RegisterDto): Promise<User> {
@@ -22,6 +25,21 @@ export class AuthService {
         status: UserStatus.PENDING,
       },
     });
+  }
+
+  async login(input: LoginDto): Promise<{ accessToken: string }> {
+    const user = await this.prisma.user.findUnique({ where: { email: normalizeEmail(input.email) } });
+
+    if (
+      !user ||
+      user.status !== UserStatus.ACTIVE ||
+      user.emailVerifiedAt === null ||
+      !(await this.passwords.verify(user.passwordHash, input.password))
+    ) {
+      throw new Error('Invalid email or password');
+    }
+
+    return { accessToken: this.jwt.sign({ id: user.id, email: user.email }) };
   }
 }
 
