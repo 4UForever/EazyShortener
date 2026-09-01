@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Login | EazyShortener</title>
+    <link rel="stylesheet" href="/assets/app.css" />
+  </head>
+  <body>
+    <main class="auth-shell">
+      <section class="auth-card" aria-labelledby="login-title">
+        <a class="brand-mark" href="/">EazyShortener</a>
+        <p class="eyebrow">Welcome back</p>
+        <h1 id="login-title">Sign in</h1>
+        <p class="auth-intro">Use the verified account you created with EazyShortener.</p>
+        {{authFeedback}}
+        <form method="post" action="/login" class="auth-form">
+          <label for="email">Email</label>
+          <input id="email" name="email" type="email" autocomplete="email" required value="{{authEmail}}" />
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" autocomplete="current-password" required />
+          <button type="submit">Sign in</button>
+        </form>
+        <p class="auth-switch">Need an account? <a href="/register">Register</a></p>
+      </section>
+    </main>
+  </body>
+</html>
