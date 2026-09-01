@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Header, Post, Res } from '@nestjs/common';
+import { Body, Controller, Get, Header, Post, Query, Res } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
@@ -23,6 +23,10 @@ interface CookieResponse {
     value: string,
     options: { httpOnly: boolean; sameSite: 'lax'; secure: boolean; maxAge: number; path: string },
   ): void;
+}
+
+interface RedirectResponse {
+  redirect(statusCode: number, url: string): void;
 }
 
 @Controller()
@@ -62,6 +66,24 @@ export class WebAuthController {
         error: error instanceof Error ? error.message : 'Unable to register this account',
       });
     }
+  }
+
+  @Get('verify-email')
+  async verifyEmail(@Query('token') token: string | undefined, @Res() response: RedirectResponse): Promise<void> {
+    try {
+      if (!token) throw new Error('Missing verification token');
+      await this.emailVerification.verify(token);
+      response.redirect(303, '/verify-email/result?status=success');
+    } catch {
+      response.redirect(303, '/verify-email/result?status=failure');
+    }
+  }
+
+  @Get('verify-email/result')
+  @Header('Content-Type', 'text/html; charset=utf-8')
+  verificationResult(@Query('status') status: string | undefined): Promise<string> {
+    const success = status === 'success';
+    return this.renderVerificationResult(success);
   }
 
   @Get('login')
@@ -118,6 +140,22 @@ export class WebAuthController {
         : '';
 
     return template.replaceAll('{{authEmail}}', email).replace('{{authFeedback}}', feedback);
+  }
+
+  private async renderVerificationResult(success: boolean): Promise<string> {
+    const template = await readFile(join(process.cwd(), 'views', 'verify-email.hbs'), 'utf8');
+    const title = success ? 'Email verified' : 'Verification failed';
+    const message = success
+      ? 'Your email has been verified. You can now sign in to EazyShortener.'
+      : 'This verification link is invalid, expired, or has already been used.';
+    const action = success
+      ? '<a href="/login">Continue to sign in</a>'
+      : '<a href="/register">Return to registration</a>';
+
+    return template
+      .replace('{{verifyTitle}}', title)
+      .replace('{{verifyMessage}}', message)
+      .replace('{{verifyAction}}', action);
   }
 }
 
