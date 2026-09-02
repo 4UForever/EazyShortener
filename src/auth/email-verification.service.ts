@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { UserStatus } from '@prisma/client';
 import { ConfigService } from '@nestjs/config';
 import { createHash, randomBytes } from 'node:crypto';
+import { ApiTokensService } from '../api-tokens/api-tokens.service';
+import { IssuedApiToken } from '../api-tokens/api-token.service';
 import { PrismaService } from '../database/prisma.service';
 
 const TOKEN_BYTES = 32;
@@ -11,6 +13,7 @@ export class EmailVerificationService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly config: ConfigService,
+    private readonly apiTokens: ApiTokensService,
   ) {}
 
   async issue(userId: string, now = new Date()): Promise<{ rawToken: string; expiresAt: Date }> {
@@ -52,10 +55,13 @@ export class EmailVerificationService {
     return token.userId;
   }
 
-  async verify(rawToken: string, now = new Date()): Promise<string> {
+  async verify(
+    rawToken: string,
+    now = new Date(),
+  ): Promise<{ userId: string; initialApiToken: IssuedApiToken | null }> {
     const tokenHash = this.hashToken(rawToken);
 
-    return this.prisma.$transaction(async (tx) => {
+    const userId = await this.prisma.$transaction(async (tx) => {
       const token = await tx.emailVerificationToken.findUnique({
         where: { tokenHash },
         select: { id: true, userId: true },
@@ -84,6 +90,9 @@ export class EmailVerificationService {
 
       return token.userId;
     });
+
+    const initialApiToken = await this.apiTokens.issueInitialIfAbsent(userId, now);
+    return { userId, initialApiToken };
   }
 
   private hashToken(rawToken: string): string {

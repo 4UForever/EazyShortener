@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ApiTokensModule } from '../api-tokens/api-tokens.module';
 import { DatabaseModule } from '../database/database.module';
 import { AppKeyService } from '../security/app-key.service';
 import { MailModule } from '../mail/mail.module';
@@ -12,7 +13,7 @@ import { JwtStrategy } from './jwt.strategy';
 import { PasswordService } from './password.service';
 
 @Module({
-  imports: [DatabaseModule, MailModule],
+  imports: [ApiTokensModule, DatabaseModule, MailModule],
   controllers: [AuthController, WebAuthController],
   providers: [AppKeyService, AuthService, EmailVerificationService, JwtGuard, JwtService, JwtStrategy, PasswordService],
   exports: [AuthService, EmailVerificationService, JwtGuard, JwtService],
