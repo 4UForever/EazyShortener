@@ -1,6 +1,13 @@
-import { BadRequestException, Body, Controller, Post } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { User } from '@prisma/client';
+import { JwtGuard } from '../auth/jwt.guard';
 import { CreateLinkDto } from './dto/create-link.dto';
+import { ListLinksDto, normalizeLinkPagination } from './dto/list-links.dto';
 import { LinksService } from './links.service';
+
+interface AuthenticatedLinksRequest {
+  user: User;
+}
 
 interface GuestCreateLinkBody {
   originalUrl?: unknown;
@@ -12,6 +19,22 @@ interface GuestCreateLinkBody {
 @Controller('api/links')
 export class LinksController {
   constructor(private readonly linksService: LinksService) {}
+
+  @Get()
+  @UseGuards(JwtGuard)
+  async listOwned(@Req() request: AuthenticatedLinksRequest, @Query() query: ListLinksDto) {
+    const pagination = normalizeLinkPagination(query);
+    const result = await this.linksService.listOwned(request.user.id, pagination);
+
+    return {
+      links: result.links,
+      pagination: {
+        page: pagination.page,
+        limit: pagination.limit,
+        total: result.total,
+      },
+    };
+  }
 
   @Post('guest')
   async createGuest(@Body() body: GuestCreateLinkBody) {

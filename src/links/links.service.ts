@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Link, LinkCreatedVia, Prisma } from '@prisma/client';
 import { PrismaService } from '../database/prisma.service';
 import { CreateLinkDto } from './dto/create-link.dto';
+import { LinkPagination } from './dto/list-links.dto';
 import {
   normalizeCustomAlias,
   normalizeExpiration,
@@ -33,6 +34,21 @@ export class LinksService {
       userId: null,
       createdVia: LinkCreatedVia.GUEST_WEB,
     });
+  }
+
+  async listOwned(userId: string, pagination: LinkPagination): Promise<{ links: Link[]; total: number }> {
+    const where = { userId };
+    const [links, total] = await this.prisma.$transaction([
+      this.prisma.link.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip: (pagination.page - 1) * pagination.limit,
+        take: pagination.limit,
+      }),
+      this.prisma.link.count({ where }),
+    ]);
+
+    return { links, total };
   }
 
   async createRegistered(
