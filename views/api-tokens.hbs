@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" /><title>API tokens | EazyShortener</title></head>
+<body>
+<main>
+  <a href="/dashboard">Dashboard</a>
+  <h1>API tokens</h1>
+  <p>Create and revoke tokens for client API access.</p>
+  {{apiTokenFeedback}}
+  <form method="post" action="/api-tokens">
+    <label for="token-name">Name</label>
+    <input id="token-name" name="name" required maxlength="100" placeholder="My integration" />
+    <label for="token-expiration">Expiration (optional)</label>
+    <input id="token-expiration" name="expiresAt" type="datetime-local" />
+    <button type="submit">Create token</button>
+  </form>
+  <table>
+    <thead><tr><th>Name</th><th>Prefix</th><th>Expires</th><th>Status</th></tr></thead>
+    <tbody>{{apiTokenRows}}</tbody>
+  </table>
+</main>
+</body>
+</html>

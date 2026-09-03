@@ -9,9 +9,10 @@ import { LinksModule } from './links/links.module';
 import { RedirectModule } from './redirect/redirect.module';
 import { DashboardController } from './web/dashboard.controller';
 import { GuestController } from './web/guest.controller';
+import { TokenController } from './web/token.controller';
 
 @Module({
   imports: [AppConfigModule, AuthModule, ClientApiModule, DatabaseModule, LinksModule, RedirectModule],
-  controllers: [AppController, DashboardController, LinksController, GuestController],
+  controllers: [AppController, DashboardController, LinksController, GuestController, TokenController],
 })
 export class AppModule {}
