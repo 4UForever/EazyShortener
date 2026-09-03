@@ -23,6 +23,7 @@
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.2.1",
     "@nestjs/platform-express": "^11.2.1",
+    "@nestjs/swagger": "^11.2.0",
     "@prisma/client": "^6.0.0",
     "argon2": "^0.44.0",
     "nodemailer": "^9.0.5",
