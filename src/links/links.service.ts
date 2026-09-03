@@ -35,6 +35,28 @@ export class LinksService {
     });
   }
 
+  async createRegistered(
+    userId: string,
+    input: CreateLinkDto & { customAlias?: string | null },
+  ): Promise<Link> {
+    const originalUrl = validateTargetUrl(input.originalUrl);
+    const expiresAt = normalizeExpiration(input.expiresAt);
+    const shortCode = input.customAlias
+      ? await this.resolveCustomAlias(this.prisma, input.customAlias)
+      : await this.generateShortCode(this.prisma);
+
+    return this.prisma.link.create({
+      data: {
+        userId,
+        shortCode,
+        originalUrl,
+        expiresAt,
+        isActive: true,
+        createdVia: LinkCreatedVia.USER_WEB,
+      },
+    });
+  }
+
   async createApiInTransaction(
     tx: Prisma.TransactionClient,
     userId: string,

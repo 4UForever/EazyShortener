@@ -7,10 +7,11 @@ import { DatabaseModule } from './database/database.module';
 import { LinksController } from './links/links.controller';
 import { LinksModule } from './links/links.module';
 import { RedirectModule } from './redirect/redirect.module';
+import { DashboardController } from './web/dashboard.controller';
 import { GuestController } from './web/guest.controller';
 
 @Module({
   imports: [AppConfigModule, AuthModule, ClientApiModule, DatabaseModule, LinksModule, RedirectModule],
-  controllers: [AppController, LinksController, GuestController],
+  controllers: [AppController, DashboardController, LinksController, GuestController],
 })
 export class AppModule {}

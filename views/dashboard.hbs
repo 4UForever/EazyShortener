@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard | EazyShortener</title>
+</head>
+<body>
+  <main>
+    <section aria-labelledby="dashboard-title">
+      <a href="/">EazyShortener</a>
+      <h1 id="dashboard-title">Your link dashboard</h1>
+      <p>Signed in as {{dashboardEmail}}</p>
+      {{dashboardFeedback}}
+      <form method="post" action="/dashboard/links">
+        <label for="original-url">Destination URL</label>
+        <input id="original-url" name="originalUrl" type="url" required maxlength="2048" value="{{dashboardOriginalUrl}}" placeholder="https://example.com/article" />
+        <label for="custom-alias">Custom alias (optional)</label>
+        <input id="custom-alias" name="customAlias" type="text" maxlength="32" value="{{dashboardCustomAlias}}" placeholder="my-link" />
+        <label for="expires-at">Expiration (optional)</label>
+        <input id="expires-at" name="expiresAt" type="datetime-local" value="{{dashboardExpiresAt}}" />
+        <button type="submit">Create short link</button>
+      </form>
+      <p><a href="/api-tokens">Manage API tokens</a></p>
+    </section>
+  </main>
+</body>
+</html>
