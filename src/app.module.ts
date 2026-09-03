@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AuthModule } from './auth/auth.module';
+import { ClientApiModule } from './client-api/client-api.module';
 import { AppConfigModule } from './config/config.module';
 import { DatabaseModule } from './database/database.module';
 import { LinksController } from './links/links.controller';
@@ -9,7 +10,7 @@ import { RedirectModule } from './redirect/redirect.module';
 import { GuestController } from './web/guest.controller';
 
 @Module({
-  imports: [AppConfigModule, AuthModule, DatabaseModule, LinksModule, RedirectModule],
+  imports: [AppConfigModule, AuthModule, ClientApiModule, DatabaseModule, LinksModule, RedirectModule],
   controllers: [AppController, LinksController, GuestController],
 })
 export class AppModule {}
