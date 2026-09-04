@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Link, LinkCreatedVia, Prisma } from '@prisma/client';
+import { RedirectCacheService } from '../cache/redirect-cache.service';
 import { PrismaService } from '../database/prisma.service';
 import { CreateLinkDto } from './dto/create-link.dto';
 import { LinkPagination } from './dto/list-links.dto';
@@ -28,6 +29,7 @@ export class LinksService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly shortCodes: ShortCodeService,
+    private readonly redirectCache: RedirectCacheService,
   ) {}
 
   async createGuest(input: CreateLinkDto): Promise<Link> {
@@ -79,6 +81,8 @@ export class LinksService {
 
     const link = await this.prisma.link.findUnique({ where: { id: linkId } });
     if (!link) throw new Error('Link not found');
+
+    await this.redirectCache.invalidate(link.shortCode);
     return link;
   }
 
