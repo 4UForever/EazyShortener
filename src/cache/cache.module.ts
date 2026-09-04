@@ -1,9 +1,10 @@
 import { Global, Module } from '@nestjs/common';
+import { RedirectCacheService } from './redirect-cache.service';
 import { RedisService } from './redis.service';
 
 @Global()
 @Module({
-  providers: [RedisService],
-  exports: [RedisService],
+  providers: [RedirectCacheService, RedisService],
+  exports: [RedirectCacheService, RedisService],
 })
 export class CacheModule {}
