@@ -1,8 +1,9 @@
-import { BadRequestException, Body, Controller, Get, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { JwtGuard } from '../auth/jwt.guard';
 import { CreateLinkDto } from './dto/create-link.dto';
 import { ListLinksDto, normalizeLinkPagination } from './dto/list-links.dto';
+import { UpdateLinkDto } from './dto/update-link.dto';
 import { LinksService } from './links.service';
 
 interface AuthenticatedLinksRequest {
@@ -34,6 +35,44 @@ export class LinksController {
         total: result.total,
       },
     };
+  }
+
+  @Patch(':id')
+  @UseGuards(JwtGuard)
+  async updateOwned(
+    @Param('id') id: string,
+    @Req() request: AuthenticatedLinksRequest,
+    @Body() body: Record<string, unknown>,
+  ) {
+    if (body.shortCode !== undefined || body.customAlias !== undefined) {
+      throw new BadRequestException('Short code is immutable in v1');
+    }
+
+    if (body.originalUrl !== undefined && typeof body.originalUrl !== 'string') {
+      throw new BadRequestException('originalUrl must be a string');
+    }
+    if (
+      body.expiresAt !== undefined &&
+      body.expiresAt !== null &&
+      typeof body.expiresAt !== 'string'
+    ) {
+      throw new BadRequestException('expiresAt must be a date/time string or null');
+    }
+    if (body.isActive !== undefined && typeof body.isActive !== 'boolean') {
+      throw new BadRequestException('isActive must be a boolean');
+    }
+
+    const input: UpdateLinkDto = {
+      originalUrl: body.originalUrl,
+      expiresAt: body.expiresAt,
+      isActive: body.isActive,
+    };
+
+    try {
+      return await this.linksService.updateOwned(request.user.id, id, input);
+    } catch (error) {
+      throw new BadRequestException(error instanceof Error ? error.message : 'Unable to update link');
+    }
   }
 
   @Post('guest')

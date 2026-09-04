@@ -3,6 +3,7 @@ import { Link, LinkCreatedVia, Prisma } from '@prisma/client';
 import { PrismaService } from '../database/prisma.service';
 import { CreateLinkDto } from './dto/create-link.dto';
 import { LinkPagination } from './dto/list-links.dto';
+import { UpdateLinkDto } from './dto/update-link.dto';
 import {
   normalizeCustomAlias,
   normalizeExpiration,
@@ -49,6 +50,36 @@ export class LinksService {
     ]);
 
     return { links, total };
+  }
+
+  async updateOwned(userId: string, linkId: string, input: UpdateLinkDto): Promise<Link> {
+    const data: Prisma.LinkUpdateManyMutationInput = {};
+
+    if (input.originalUrl !== undefined) {
+      data.originalUrl = validateTargetUrl(input.originalUrl.trim());
+    }
+
+    if (input.expiresAt !== undefined) {
+      data.expiresAt = normalizeExpiration(input.expiresAt);
+    }
+
+    if (input.isActive !== undefined) {
+      data.isActive = input.isActive;
+    }
+
+    if (Object.keys(data).length === 0) {
+      throw new Error('At least one mutable link field is required');
+    }
+
+    const updated = await this.prisma.link.updateMany({
+      where: { id: linkId, userId },
+      data,
+    });
+    if (updated.count !== 1) throw new Error('Link not found');
+
+    const link = await this.prisma.link.findUnique({ where: { id: linkId } });
+    if (!link) throw new Error('Link not found');
+    return link;
   }
 
   async createRegistered(
